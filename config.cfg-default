@@ -1,0 +1,19 @@
+WORKDIR="/Users/<username>/tmp/work"
+CUCKOO="/Users/<username>/Documents/Virtual Machines.localized/Cuckoo - Debian 8.x 64-bit.vmwarevm"
+CUCKOO_CLONE_DIR="/Users/<username>/Documents/Virtual Machines.localized/Cuckoo Clone.vmwarevm"
+CUCKOO_CLONE="$CUCKOO_CLONE_DIR/Cuckoo.vmx"
+# CUCKOO_SNAPSHOT
+CU="cuckoo"
+CP="password"
+REMNUX="/Users/<username>/Documents/Virtual Machines.localized/Ubuntu Remnux Sift 64-bit.vmwarevm"
+REMNUX_CLONE_DIR="/Users/<username>/Documents/Virtual Machines.localized/Remnux Clone.vmwarevm"
+REMNUX_CLONE="$REMNUX_CLONE_DIR/Remnux.vmx"
+# REMNUX_SNAPSHOT
+RU="malware"
+RP="password"
+WINDOWS="/Users/<username>/Documents/Virtual Machines.localized/Windows 10 x64.vmwarevm"
+WINDOWS_CLONE_DIR="/Users/<username>/Documents/Virtual Machines.localized/Windows Clone.vmwarevm"
+WINDOWS_CLONE="$WINDOWS_CLONE_DIR/Windows Clone.vmx"
+# WINDOWS_SNAPSHOT
+WU="administrator"
+WP="password"
