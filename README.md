@@ -125,4 +125,6 @@ Probably. If you dare to use this script and find bugs please file a issue repor
   - https://remnux.org/
   - https://zeltser.com/remnux-malware-analysis-tips/
 * Better reporting. Besides the file and signature parts from the Cuckoo Sandbox reports for each file the summary page only adds information about matches from Yara-Rules.
+* More tools to look at
+  - https://bitbucket.org/decalage/balbuzard/wiki/Home
 
