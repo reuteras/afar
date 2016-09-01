@@ -127,4 +127,6 @@ Probably. If you dare to use this script and find bugs please file a issue repor
 * Better reporting. Besides the file and signature parts from the Cuckoo Sandbox reports for each file the summary page only adds information about matches from Yara-Rules.
 * More tools to look at
   - https://bitbucket.org/decalage/balbuzard/wiki/Home
+  - https://github.com/Microsoft/binskim
+* Move todo to issues in Github.  
 
