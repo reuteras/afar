@@ -16,7 +16,11 @@ cd /tmp/word || exit 1
 /opt/remnux-oletools/pyxswf.py "$VIRUS_FULL_PATH" > /tmp/word/pyxswf.txt 2>&1 || rm /tmp/word/pyxswf.txt
 /opt/remnux-didier/oledump.py "$VIRUS_FULL_PATH" > /tmp/word/oledump.txt
 if [[ -e /home/malware/src/git/DidierStevensSuite/oledump.py ]]; then
-   /home/malware/src/git/DidierStevensSuite/oledump.py "$VIRUS_FULL_PATH" > /tmp/word/oledump-latest.txt 2>&1
+   python /home/malware/src/git/DidierStevensSuite/oledump.py "$VIRUS_FULL_PATH" > /tmp/word/oledump-latest.txt 2>&1
+fi
+if [[ -d /home/malware/src/git/oletools ]]; then
+   /home/malware/src/git/oletools/oletools/mraptor.py "$VIRUS_FULL_PATH" > /tmp/word/mraptor-latest.txt 2>&1
+   /home/malware/src/git/oletools/oletools/olevba.py "$VIRUS_FULL_PATH" > /tmp/word/olevba-latest.txt 2>&1
 fi
 mkdir /tmp/word/officeparser
 /opt/remnux-scripts/officeparser.py -o /tmp/word/officeparser --extract-streams --extract-ole-streams --extract-macros "$VIRUS_FULL_PATH" >  /tmp/word/officeparser.txt 2>&1
@@ -24,5 +28,6 @@ mkdir /tmp/word/officeparser
 
 cd /tmp/word || exit 1
 rm -f ../word_report.zip
+find /tmp/word -empty -type f -delete
 zip -r ../word_report.zip -- *
 
