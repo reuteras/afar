@@ -7,7 +7,7 @@ CUCKOO_RUNNING="FALSE"
 REMNUX_RUNNING="FALSE"
 WINDOWS_RUNNING="FALSE"
 # shellcheck source=/dev/null
-[ -e config.cfg ] && . config.cfg
+([ -e ~/.cert-config.cfg ] && . ~/.cert-config.cfg ) || ([ -e config.cfg ] && . config.cfg)
 
 function show_help {
     echo "    $0 [-h] [-v] [-o] [-w] [-c config] [-C] [-R] [-W] [-Z] file1 ... fileN"
