@@ -8,6 +8,10 @@ VIRUS_FILE_NAME=$(basename "$VIRUS_FULL_PATH")
 mkdir /tmp/pe32
 cd /tmp/pe32 || exit 1
 
+if [[ -e /home/malware/src/bin/floss ]]; then
+    /home/malware/src/bin/floss "$VIRUS_FULL_PATH" > /tmp/word/floss.txt 2>&1 || rm /tmp/word/floss.txt
+fi
+
 /opt/remnux-scripts/packerid -P -a -e -m "$VIRUS_FULL_PATH" > /tmp/pe32/packerid_long.txt 2>&1
 /opt/remnux-scripts/packerid "$VIRUS_FULL_PATH" > /tmp/pe32/packerid_short.txt 2>&1
 /bin/signsrch "$VIRUS_FULL_PATH" > /tmp/pe32/signsrch.txt 2>&1

@@ -8,6 +8,9 @@ VIRUS_FULL_PATH="$1"
 mkdir /tmp/word
 cd /tmp/word || exit 1
 
+if [[ -e /home/malware/src/bin/floss ]]; then
+    /home/malware/src/bin/floss "$VIRUS_FULL_PATH" > /tmp/word/floss.txt 2>&1 || rm /tmp/word/floss.txt
+fi
 /opt/remnux-oletools/olevba.py "$VIRUS_FULL_PATH" > /tmp/word/olevba.txt 2>&1 || rm /tmp/word/olevba.txt
 /opt/remnux-oletools/oleid.py "$VIRUS_FULL_PATH" > /tmp/word/oleid.txt 2>&1 || rm /tmp/word/oleid.txt
 /opt/remnux-oletools/olemeta.py "$VIRUS_FULL_PATH" > /tmp/word/olemeta.txt 2>&1 || rm /tmp/word/olemeta.txt
