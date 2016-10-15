@@ -9,7 +9,7 @@ mkdir /tmp/pdf
 cd /tmp/pdf || exit 1
 
 if [[ -e /home/malware/src/bin/floss ]]; then
-    /home/malware/src/bin/floss "$VIRUS_FULL_PATH" > /tmp/word/floss.txt 2>&1 || rm /tmp/word/floss.txt
+    /home/malware/src/bin/floss "$VIRUS_FULL_PATH" > /tmp/pdf/floss.txt 2>&1 || rm /tmp/pdf/floss.txt
 fi
 /opt/remnux-scripts/AnalyzePDF.py "$VIRUS_FULL_PATH" > /tmp/pdf/AnalyzePDF.txt 2>&1
 /opt/remnux-didier/pdfid.py -e -f "$VIRUS_FULL_PATH" > /tmp/pdf/pdfid-e-f.txt 2>&1

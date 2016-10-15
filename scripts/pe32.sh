@@ -9,7 +9,7 @@ mkdir /tmp/pe32
 cd /tmp/pe32 || exit 1
 
 if [[ -e /home/malware/src/bin/floss ]]; then
-    /home/malware/src/bin/floss "$VIRUS_FULL_PATH" > /tmp/word/floss.txt 2>&1 || rm /tmp/word/floss.txt
+    /home/malware/src/bin/floss "$VIRUS_FULL_PATH" > /tmp/pe32/floss.txt 2>&1 || rm /tmp/pe32/floss.txt
 fi
 
 /opt/remnux-scripts/packerid -P -a -e -m "$VIRUS_FULL_PATH" > /tmp/pe32/packerid_long.txt 2>&1
