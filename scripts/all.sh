@@ -1,7 +1,7 @@
 #!/bin/bash
 # Yara output used in summary report
 VIRUS_FULL_PATH="$1"
-VIRUS_DIR_PATH="$(dirname "$1")"
+#VIRUS_DIR_PATH="$(dirname "$1")"
 #VIRUS_FILE_NAME=$(basename "$VIRUS_FULL_PATH")
 
 [[ -d /tmp/all ]] && rm -rf /tmp/all
@@ -20,8 +20,9 @@ if [ -d /home/malware/src/git/rules ]; then
     yara "$yara_rules" "$VIRUS_FULL_PATH" > /tmp/all/yara_documents.txt
     rm -f "$yara_rules"
 fi
-/usr/bin/bulk_extractor -R "$VIRUS_DIR_PATH" -o /tmp/all/bulk_extractor > /tmp/all/bulk_extractor_output.txt 2>&1
-/usr/local/bin/densityscout -pe -a "$VIRUS_FULL_PATH" > /tmp/all/densityscout.txt 2>&1
+# Move to sift vm?
+#/usr/bin/bulk_extractor -R "$VIRUS_DIR_PATH" -o /tmp/all/bulk_extractor > /tmp/all/bulk_extractor_output.txt 2>&1
+/usr/bin/densityscout -pe -a "$VIRUS_FULL_PATH" > /tmp/all/densityscout.txt 2>&1
 
 # Remove empty files
 find /tmp/all/bulk_extractor -type f -size 0c -exec rm {} \; || true
