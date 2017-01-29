@@ -28,6 +28,7 @@ Tools used by AFAR in REMnux includes but are not limited to:
 * [oletimes.py](http://www.decalage.info/python/oletools)
 * [officeparser.py](https://github.com/unixfreak0037/officeparser)
 * [pyOLEScanner.py](https://github.com/Evilcry/PythonScripts/raw/master/)
+* [byte-stats.py](https://blog.didierstevens.com/2017/01/28/update-byte-stats-py-version-0-0-5/)
 
 ## Background
 
