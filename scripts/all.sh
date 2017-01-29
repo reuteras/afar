@@ -22,7 +22,8 @@ if [ -d /home/malware/src/git/rules ]; then
 fi
 # Move to sift vm?
 #/usr/bin/bulk_extractor -R "$VIRUS_DIR_PATH" -o /tmp/all/bulk_extractor > /tmp/all/bulk_extractor_output.txt 2>&1
-/usr/bin/densityscout -pe -a "$VIRUS_FULL_PATH" > /tmp/all/densityscout.txt 2>&1
+[[ -f /usr/bin/densityscout ]] && /usr/bin/densityscout -pe -a "$VIRUS_FULL_PATH" > /tmp/all/densityscout.txt 2>&1
+[[ -f /opt/remnux-didier/byte-stats.py ]] && /opt/remnux-didier/byte-stats.py -a "$VIRUS_FULL_PATH" > /tmp/all/byte-stats.txt 2>&1
 
 # Remove empty files
 find /tmp/all/bulk_extractor -type f -size 0c -exec rm {} \; || true
