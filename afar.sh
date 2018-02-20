@@ -101,16 +101,19 @@ function copy_to_linux_submit_cuckoo {
         [[ ! -d "$WORKDIR/$nr" ]] && mkdir "$WORKDIR/$nr"
 
         # Copy file to VM
-        [[ ! -z $CUCKOO && ! -z $REMNUX ]] && echo -n "Copy $virus to Cuckoo and REMnux. Submit to Cuckoo."
-        [[ ! -z $CUCKOO && -z $REMNUX ]] && echo -n "Copy $virus to Cuckoo. Submit to Cuckoo."
-        [[ -z $CUCKOO && ! -z $REMNUX ]] && echo -n "Copy $virus to REMnux.."
-        [ ! -z "$CUCKOO" ] && vmrun -gu "$CU" -gp "$CP" -T fusion createDirectoryInGuest "$CUCKOO_CLONE" "/tmp/virus/$nr"
-        [ ! -z "$CUCKOO" ] && vmrun -gu "$CU" -gp "$CP" -T fusion CopyFileFromHostToGuest "$CUCKOO_CLONE" "$virus" "$VM_VIRUS_FILE"
-        [ ! -z "$CUCKOO" ] && vmrun -gu "$CU" -gp "$CP" -T fusion runProgramInGuest "$CUCKOO_CLONE" \
-            /usr/bin/python /home/cuckoo/src/cuckoo/utils/submit.py "$VM_VIRUS_FILE"
-        [ ! -z "$REMNUX" ] && vmrun -gu "$RU" -gp "$RP" -T fusion createDirectoryInGuest "$REMNUX_CLONE" "/tmp/virus/$nr"
-        [ ! -z "$REMNUX" ] && vmrun -gu "$RU" -gp "$RP" -T fusion CopyFileFromHostToGuest "$REMNUX_CLONE" "$virus" "$VM_VIRUS_FILE"
-        [[ ! -z $CUCKOO || ! -z $REMNUX ]] && echo " Done."
+        [[ ! -z "$CUCKOO" ]] && echo -n "Copy script for Cuckoo submit."
+        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion CopyFileFromHostToGuest "$CUCKOO_CLONE" "scripts/submit.sh" "/tmp/submit.sh"
+        [[ ! -z "$CUCKOO" ]] && echo " Done."
+        [[ ! -z "$CUCKOO" ]] && echo -n "Copy $virus to Cuckoo."
+        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion createDirectoryInGuest "$CUCKOO_CLONE" "/tmp/virus/$nr"
+        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion CopyFileFromHostToGuest "$CUCKOO_CLONE" "$virus" "$VM_VIRUS_FILE"
+        [[ ! -z "$CUCKOO" ]] && echo -n " Submit $VM_VIRUS_FILE to Cuckoo."
+        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion runProgramInGuest "$CUCKOO_CLONE" /bin/bash /tmp/submit.sh "$VM_VIRUS_FILE"
+        [[ ! -z "$CUCKOO" ]] && echo " Done."
+        [[ ! -z "$REMNUX" ]] && echo -n "Copy $virus to REMnux.."
+        [[ ! -z "$REMNUX" ]] && vmrun -gu "$RU" -gp "$RP" -T fusion createDirectoryInGuest "$REMNUX_CLONE" "/tmp/virus/$nr"
+        [[ ! -z "$REMNUX" ]] && vmrun -gu "$RU" -gp "$RP" -T fusion CopyFileFromHostToGuest "$REMNUX_CLONE" "$virus" "$VM_VIRUS_FILE"
+        [[ ! -z "$REMNUX" ]] && echo " Done."
     done
     return 0
 }
@@ -127,34 +130,34 @@ function analyze_in_remnux_windows {
         # Run script for all files
         run_script_in_remnux "all"
 
-        if echo "$filetypeshort" | egrep "(autorun.ini)" > /dev/null ; then
+        if echo "$filetypeshort" | grep -E "(autorun.ini)" > /dev/null ; then
             # Autorun
             submit_to_cuckoo "Autorun" "autorun"
             continue
-        elif echo "$filetypeshort" | egrep "(HTML|ASCII)" > /dev/null ; then
+        elif echo "$filetypeshort" | grep -E "(HTML|ASCII)" > /dev/null ; then
             # HTML and ASCII
             submit_to_cuckoo "HTML or ASCII" "html_or_ascii"
             continue
-        elif echo "$filetype" | egrep "MS Windows shortcut" > /dev/null ; then
+        elif echo "$filetype" | grep -E "MS Windows shortcut" > /dev/null ; then
             # LNK file
             run_program_in_windows "lnk"
             [[ -e $WORKDIR/$nr/lnk.txt ]] && [[ -e /usr/local/bin/dos2unix ]] && \
                 /usr/local/bin/dos2unix "$WORKDIR/$nr/lnk.txt" > /dev/null 2>&1
             LNK_FILE=("$WORKDIR/$nr/20"*".json")
             [ -e "${LNK_FILE[0]}" ] && mv "$WORKDIR/$nr/20"*".json" "$WORKDIR/$nr/LECmd.json"
-        elif echo "$filetypeshort" | egrep "(PDF)" > /dev/null ; then
+        elif echo "$filetypeshort" | grep -E "(PDF)" > /dev/null ; then
             # PDF file
             run_script_in_remnux "pdf"
-        elif echo "$filetypeshort" | egrep "(PE32)" > /dev/null ; then
+        elif echo "$filetypeshort" | grep -E "(PE32)" > /dev/null ; then
             # PE32 file
             run_script_in_remnux "pe32"
-        elif echo "$filetypeshort" | egrep "(Zip)" > /dev/null && unzip -o -P "" -l "$virus" | egrep "docProps/" > /dev/null ; then
+        elif echo "$filetypeshort" | grep -E "(Zip)" > /dev/null && unzip -o -P "" -l "$virus" | grep -E "docProps/" > /dev/null ; then
             # Word file
             run_script_in_remnux "word"
-        elif echo "$filetypeshort" | egrep "(Zip)" > /dev/null ; then
+        elif echo "$filetypeshort" | grep -E "(Zip)" > /dev/null ; then
             # Regular zip
             submit_to_cuckoo "Zip" "zip"
-        elif echo "$filetypeshort" | egrep "(CDF)" > /dev/null ; then
+        elif echo "$filetypeshort" | grep -E "(CDF)" > /dev/null ; then
         # Word file - CDF
             run_script_in_remnux "word"
         else
@@ -367,7 +370,7 @@ function unpack_files {
             # Zip file with from SCEP quarantine on Windows.
             if [[ -e "$TEMPDIR/MpCmdRun-output.txt" ]]; then
                 for extracted in $TEMPDIR/*; do
-                    if ! echo "$extracted" | egrep "MpCmdRun-output.txt$" > /dev/null ; then
+                    if ! echo "$extracted" | grep -E "MpCmdRun-output.txt$" > /dev/null ; then
                         mkdir -p "$WORKDIR/$i/2_file"
                         generate_report
                         cp "$extracted" "$WORKDIR/$i/2_file"
