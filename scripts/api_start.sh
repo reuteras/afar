@@ -1,4 +1,6 @@
 #!/bin/bash
 
-/home/cuckoo/src/cuckoo/utils/api.py > /home/cuckoo/src/cuckoo/log/api.log 2>&1 &
-
+# shellcheck disable=SC1091
+. /etc/bash_completion.d/virtualenvwrapper
+workon cuckoo
+cuckoo api > /home/cuckoo/src/cuckoo/log/api.log 2>&1 &
