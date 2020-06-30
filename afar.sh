@@ -44,12 +44,12 @@ while getopts "vc:h?oprwCRWZ" opt; do
     c)  CONFIG=$OPTARG
 		[[ ! -e $CONFIG ]] && echo "Config file $CONFIG does not exists!." && exit 1
         # shellcheck source=/dev/null
-		. $CONFIG
+		. "$CONFIG"
         ;;
     Z)  [[ -z $WORKDIR ]] && echo "No WORKDIR." && show_help && exit 1
-        [ ! -z "$VERBOSE" ] && echo -n "Clean old WORKDIR."
+        [ -n "$VERBOSE" ] && echo -n "Clean old WORKDIR."
         rm -rf "$WORKDIR"
-        [ ! -z "$VERBOSE" ] && echo " Done."
+        [ -n "$VERBOSE" ] && echo " Done."
         ;;
     C)  unset CUCKOO
         ;;
@@ -68,32 +68,32 @@ shift $((OPTIND-1))
 # Check environment
 [ -z "$REPORT_ONLY" ] && [ $# == 0 ] && echo "Need a zip file as argument." && exit 1
 [ -z "$REPORT_ONLY" ] && [ ! -f "$1" ] && echo "No file to analyze found (checked first only)." && exit 1
-[ -z "$REPORT_ONLY" ] && [ ! -z "$CUCKOO" ] && [ -d "$CUCKOO_CLONE_DIR" ] && echo "The directory $CUCKOO_CLONE_DIR exists. Remove it and run the script again." && exit 1
-[ -z "$REPORT_ONLY" ] && [ ! -z "$REMNUX" ] && [ -d "$REMNUX_CLONE_DIR" ] && echo "The directory $REMNUX_CLONE_DIR exists. Remove it and run the script again." && exit 1
-[ -z "$REPORT_ONLY" ] && [ ! -z "$WINDOWS" ] && [ -d "$WINDOWS_CLONE_DIR" ] && echo "The directory $WINDOWS_CLONE_DIR exists. Remove it and run the script again." && exit 1
+[ -z "$REPORT_ONLY" ] && [ -n "$CUCKOO" ] && [ -d "$CUCKOO_CLONE_DIR" ] && echo "The directory $CUCKOO_CLONE_DIR exists. Remove it and run the script again." && exit 1
+[ -z "$REPORT_ONLY" ] && [ -n "$REMNUX" ] && [ -d "$REMNUX_CLONE_DIR" ] && echo "The directory $REMNUX_CLONE_DIR exists. Remove it and run the script again." && exit 1
+[ -z "$REPORT_ONLY" ] && [ -n "$WINDOWS" ] && [ -d "$WINDOWS_CLONE_DIR" ] && echo "The directory $WINDOWS_CLONE_DIR exists. Remove it and run the script again." && exit 1
 [ -z "$REPORT_ONLY" ] && [ -d "$WORKDIR" ] && echo "Report and workdir 'work' exists. Remove it and run the script again." && exit 1
 [ -z "$REPORT_ONLY" ] && mkdir -p "$WORKDIR"
 
 # Start scripts
 function startVM {
-    [ ! -z "$CUCKOO" ] && start_cuckoo || echo "No Cuckoo client configured."
-    [ ! -z "$REMNUX" ] && start_remnux || echo "No Remnux client configured."
-    [ ! -z $USE_WINDOWS ] && start_windows
+    [ -n "$CUCKOO" ] && start_cuckoo || echo "No Cuckoo client configured."
+    [ -n "$REMNUX" ] && start_remnux || echo "No Remnux client configured."
+    [ -n "$USE_WINDOWS" ] && start_windows
     return 0
 }
 
 function wait_for_linux {
-    [ ! -z "$REMNUX" ] && echo -n "Wait for REMnux."
-    [ ! -z "$REMNUX" ] && vmrun -T fusion getGuestIPAddress "$REMNUX_CLONE" -wait > /dev/null
-    [ ! -z "$REMNUX" ] && echo " Done."
-    [ ! -z "$CUCKOO" ] && echo -n "Wait for Cuckoo."
-    [ ! -z "$CUCKOO" ] && vmrun -T fusion getGuestIPAddress "$CUCKOO_CLONE" -wait > /dev/null
-    [ ! -z "$CUCKOO" ] && echo " Done."
+    [ -n "$REMNUX" ] && echo -n "Wait for REMnux."
+    [ -n "$REMNUX" ] && vmrun -T fusion getGuestIPAddress "$REMNUX_CLONE" -wait > /dev/null
+    [ -n "$REMNUX" ] && echo " Done."
+    [ -n "$CUCKOO" ] && echo -n "Wait for Cuckoo."
+    [ -n "$CUCKOO" ] && vmrun -T fusion getGuestIPAddress "$CUCKOO_CLONE" -wait > /dev/null
+    [ -n "$CUCKOO" ] && echo " Done."
     return 0
 }
 
 function copy_to_linux_submit_cuckoo {
-    for virus in $WORKDIR/*/2_file/*; do
+    for virus in "$WORKDIR"/*/2_file/*; do
         nr=$(echo "$virus" | sed -e 's!/2_file/.*!!' | sed -e 's!.*/!!')
         [ -e "$WORKDIR/$nr/6_duplicate" ] && echo "Duplicate. Next" && continue
         virus_file="$(basename "$virus")"
@@ -101,25 +101,25 @@ function copy_to_linux_submit_cuckoo {
         [[ ! -d "$WORKDIR/$nr" ]] && mkdir "$WORKDIR/$nr"
 
         # Copy file to VM
-        [[ ! -z "$CUCKOO" ]] && echo -n "Copy script for Cuckoo submit."
-        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion CopyFileFromHostToGuest "$CUCKOO_CLONE" "scripts/submit.sh" "/tmp/submit.sh"
-        [[ ! -z "$CUCKOO" ]] && echo " Done."
-        [[ ! -z "$CUCKOO" ]] && echo -n "Copy $virus to Cuckoo."
-        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion createDirectoryInGuest "$CUCKOO_CLONE" "/tmp/virus/$nr"
-        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion CopyFileFromHostToGuest "$CUCKOO_CLONE" "$virus" "$VM_VIRUS_FILE"
-        [[ ! -z "$CUCKOO" ]] && echo -n " Submit $VM_VIRUS_FILE to Cuckoo."
-        [[ ! -z "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion runProgramInGuest "$CUCKOO_CLONE" /bin/bash /tmp/submit.sh "$VM_VIRUS_FILE"
-        [[ ! -z "$CUCKOO" ]] && echo " Done."
-        [[ ! -z "$REMNUX" ]] && echo -n "Copy $virus to REMnux.."
-        [[ ! -z "$REMNUX" ]] && vmrun -gu "$RU" -gp "$RP" -T fusion createDirectoryInGuest "$REMNUX_CLONE" "/tmp/virus/$nr"
-        [[ ! -z "$REMNUX" ]] && vmrun -gu "$RU" -gp "$RP" -T fusion CopyFileFromHostToGuest "$REMNUX_CLONE" "$virus" "$VM_VIRUS_FILE"
-        [[ ! -z "$REMNUX" ]] && echo " Done."
+        [[ -n "$CUCKOO" ]] && echo -n "Copy script for Cuckoo submit."
+        [[ -n "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion CopyFileFromHostToGuest "$CUCKOO_CLONE" "scripts/submit.sh" "/tmp/submit.sh"
+        [[ -n "$CUCKOO" ]] && echo " Done."
+        [[ -n "$CUCKOO" ]] && echo -n "Copy $virus to Cuckoo."
+        [[ -n "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion createDirectoryInGuest "$CUCKOO_CLONE" "/tmp/virus/$nr"
+        [[ -n "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion CopyFileFromHostToGuest "$CUCKOO_CLONE" "$virus" "$VM_VIRUS_FILE"
+        [[ -n "$CUCKOO" ]] && echo -n " Submit $VM_VIRUS_FILE to Cuckoo."
+        [[ -n "$CUCKOO" ]] && vmrun -gu "$CU" -gp "$CP" -T fusion runProgramInGuest "$CUCKOO_CLONE" /bin/bash /tmp/submit.sh "$VM_VIRUS_FILE"
+        [[ -n "$CUCKOO" ]] && echo " Done."
+        [[ -n "$REMNUX" ]] && echo -n "Copy $virus to REMnux.."
+        [[ -n "$REMNUX" ]] && vmrun -gu "$RU" -gp "$RP" -T fusion createDirectoryInGuest "$REMNUX_CLONE" "/tmp/virus/$nr"
+        [[ -n "$REMNUX" ]] && vmrun -gu "$RU" -gp "$RP" -T fusion CopyFileFromHostToGuest "$REMNUX_CLONE" "$virus" "$VM_VIRUS_FILE"
+        [[ -n "$REMNUX" ]] && echo " Done."
     done
     return 0
 }
 
 function analyze_in_remnux_windows {
-    for virus in $WORKDIR/*/2_file/*; do
+    for virus in "$WORKDIR"/*/2_file/*; do
         nr=$(echo "$virus" | sed -e 's!/2_file/.*!!' | sed -e 's!.*/!!')
         [ -e "$WORKDIR/$nr/6_duplicate" ] && echo "Duplicate. Next" && continue
         filetype="$(file -b "$virus")"
@@ -251,7 +251,7 @@ function run_script_in_remnux {
 }
 
 function start_cuckoo {
-    : ${CUCKOO_SNAPSHOT:="$(vmrun -T fusion listSnapshots "$CUCKOO" | tail -1)"}
+    : "${CUCKOO_SNAPSHOT:=$(vmrun -T fusion listSnapshots "$CUCKOO" | tail -1)}"
     echo -n "Cuckoo: clone using '$CUCKOO_SNAPSHOT'."
     vmrun -T fusion clone "$CUCKOO" "$CUCKOO_CLONE" linked -snapshot="$CUCKOO_SNAPSHOT" -cloneName="CUCKOO_Clone" || \
         (echo "" && echo "Failed to clone Cuckoo" && exit 1)
@@ -262,8 +262,8 @@ function start_cuckoo {
 }
 
 function start_remnux {
-    : ${REMNUX_SNAPSHOT:="$(vmrun -T fusion listSnapshots "$REMNUX" | tail -1)"}
-    echo -n "REMnux: clone using '$REMNUX_SNAPSHOT'."
+    : "${REMNUX_SNAPSHOT:=$(vmrun -T fusion listSnapshots "$REMNUX" | tail -1)}"
+    echo -n "REMnux: clone using $REMNUX_SNAPSHOT."
     vmrun -T fusion clone "$REMNUX" "$REMNUX_CLONE" linked -snapshot="$REMNUX_SNAPSHOT" -cloneName="REMNUX_Clone" || \
         (echo "" && echo "Failed to clone Cuckoo" && exit 1)
     echo -n " Start clone."
@@ -273,14 +273,14 @@ function start_remnux {
 }
 
 function start_windows {
-    : ${WINDOWS_SNAPSHOT:="$(vmrun -T fusion listSnapshots "$WINDOWS" | tail -1)"}
+    : "${WINDOWS_SNAPSHOT:=$(vmrun -T fusion listSnapshots "$WINDOWS" | tail -1)}"
     echo -n "Windows: clone using $CUCKOO_SNAPSHOT."
     vmrun -T fusion clone "$WINDOWS" "$WINDOWS_CLONE" linked -snapshot="$WINDOWS_SNAPSHOT" -cloneName="Windows_clone"
     echo -n " Start clone."
     vmrun -T fusion start "$WINDOWS_CLONE" nogui > /dev/null
     echo -n " Wait for boot."
     WINDOWS_IP=$(vmrun -T fusion getGuestIPAddress "$WINDOWS_CLONE" -wait)
-    [ ! -z  $VERBOSE ] && echo -n " Windows ip: $WINDOWS_IP."
+    [ -n  "$VERBOSE" ] && echo -n " Windows ip: $WINDOWS_IP."
     echo " Done."
     if ! vmrun -gu "$WU" -gp "$WP" -T fusion directoryExistsInGuest "$WINDOWS_CLONE" "c:\\Run" > /dev/null ; then
         echo -n "Create default directory structure under c:\\Run iand copy files."
@@ -369,7 +369,7 @@ function unpack_files {
             unzip -o -P infected "$file" -d "$TEMPDIR" > /dev/null 2>&1 || true
             # Zip file with from SCEP quarantine on Windows.
             if [[ -e "$TEMPDIR/MpCmdRun-output.txt" ]]; then
-                for extracted in $TEMPDIR/*; do
+                for extracted in "$TEMPDIR"/*; do
                     if ! echo "$extracted" | grep -E "MpCmdRun-output.txt$" > /dev/null ; then
                         mkdir -p "$WORKDIR/$i/2_file"
                         generate_report
@@ -417,7 +417,7 @@ function clean_filenames {
         newfilename=$(echo "$filename" | sed -e "s/[^-_.\/a-zA-Z0-9]/_/g")
         if [[ "$newfilename" != "$filename" ]]; then
             mv "$filename" "$newfilename"
-            [ ! -z "$VERBOSE" ] && echo"" && echo "Renamed file $filename to $newfilename."
+            [ -n "$VERBOSE" ] && echo"" && echo "Renamed file $filename to $newfilename."
         fi
     done <   <(find "$WORKDIR"/*/2_file/* -type f -print0)
     echo " Done."
@@ -541,7 +541,7 @@ function yara_summary_entry {
         alert_type="yara_malware"
         message="$(cat "$WORKDIR/$id/yara_malware.txt")"
     fi
-    [ ! -z "$color" ] && add_summary_entry "$color" "$alert_type" "$message"
+    [ -n "$color" ] && add_summary_entry "$color" "$alert_type" "$message"
     return 0
 }
 
@@ -559,9 +559,11 @@ function generate_summary_report {
     add_summary_start
     for id in $(find "$WORKDIR" -maxdepth 1 -type d -name "[1-9]*" | sed -e 's!.*/!!' | sort -n); do
         if [ -e "$WORKDIR/$id/6_duplicate" ]; then
+            # shellcheck disable=SC2207
             dup=($(find "$WORKDIR/$id/"5* 2> /dev/null || true))
             # shellcheck disable=SC2001
             dup_id=$(echo "${dup[0]}" | sed -e 's/.*_//')
+            # shellcheck disable=SC2207
             filename=($(find "$WORKDIR/$id/2_file/"* | sed -e 's!.*/2_file/!!' 2> /dev/null || true))
             {
                 echo '<section id="signatures">'
@@ -572,7 +574,9 @@ function generate_summary_report {
             } >> "$REPORT"
         else
             {
+                # shellcheck disable=SC2207
                 filetype=($(find "$WORKDIR/$id/"1* | sed -e 's!.*/1_!!' 2> /dev/null || true))
+                # shellcheck disable=SC2207
                 filename=($(find "$WORKDIR/$id/2_file/"* | sed -e 's!.*/2_file/!!' 2> /dev/null || true))
                 echo '<section id="file">'
                 sed '1,/<section id="file">/d' < "$WORKDIR/$id"/3_cuckoo/reports/report.html | \
@@ -597,13 +601,13 @@ function generate_summary_report {
     done
     add_summary_end
     echo " Done."
-    [ ! -z "$OPEN_BROWSER" ] && open "$REPORT"
+    [ -n "$OPEN_BROWSER" ] && open "$REPORT"
     return 0
 }
 
 trap shutdownVM SIGHUP SIGINT SIGTERM
 
-if [ ! -z "$REPORT_ONLY" ] ; then
+if [ -n "$REPORT_ONLY" ] ; then
     generate_summary_report
     exit 0
 fi
@@ -611,8 +615,8 @@ fi
 startVM
 prepare_files "$@"
 wait_for_linux
-[ ! -z "$CUCKOO" ] && post_start_cuckoo
-[ ! -z "$REMNUX" ] && post_start_remnux
+[ -n "$CUCKOO" ] && post_start_cuckoo
+[ -n "$REMNUX" ] && post_start_remnux
 copy_to_linux_submit_cuckoo
 analyze_in_remnux_windows
 
@@ -621,12 +625,12 @@ analyze_in_remnux_windows
 [[ $WINDOWS_RUNNING == "TRUE" && -z $PAUSE ]] && shutdownWindows
 
 # Get reports from Cuckoo
-[ ! -z "$CUCKOO" ] && get_cuckoo_reports
-[ ! -z "$CUCKOO" ] && handle_cuckoo_reports
+[ -n "$CUCKOO" ] && get_cuckoo_reports
+[ -n "$CUCKOO" ] && handle_cuckoo_reports
 generate_summary_report
 
 # Clean up
-if [ ! -z $PAUSE ] ; then
+if [[ -n "$PAUSE" ]] ; then
     read -r -p "Type yes to try to stop and delete the clones: " yes
     [ "$yes" == "yes" ] && shutdownVM
 else
