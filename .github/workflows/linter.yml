@@ -20,10 +20,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    # Now we move the dependencies where super-linter can see them
-    - name: Move the dependencies
-      run: mv .venv /home/runner/work/_temp/_github_workflow
-    # Now we set the PYTHONPATH to the path of the dependencies *inside* the container
     - name: Lint Code Base
       uses: docker://github/super-linter:v3
       env:
