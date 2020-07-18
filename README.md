@@ -124,12 +124,12 @@ Probably. If you dare to use this script and find bugs please file a issue repor
 * Code cleanup and make sure the code is secure.
 * Write a script that monitors the status of analyzes running in Cuckoo to make it possible to estimate when the report is finished.
 * Look at the test executed on files. At the moment it's the result of a quick and dirty look through the REMnux documentation. Write scripts for more file types (jar, ps1 and more). Find test files for each type of file. The following sources are some that can be useful.
-  - https://digital-forensics.sans.org/community/downloads/#howtos
-  - https://remnux.org/
-  - https://zeltser.com/remnux-malware-analysis-tips/
+  - [https://digital-forensics.sans.org/community/downloads/#howtos](https://digital-forensics.sans.org/community/downloads/#howtos)
+  - [https://remnux.org/](https://remnux.org/)
+  - [https://zeltser.com/remnux-malware-analysis-tips/](https://zeltser.com/remnux-malware-analysis-tips/)
 * Better reporting. Besides the file and signature parts from the Cuckoo Sandbox reports for each file the summary page only adds information about matches from Yara-Rules.
 * More tools to look at
-  - https://bitbucket.org/decalage/balbuzard/wiki/Home
-  - https://github.com/Microsoft/binskim
+  - [https://bitbucket.org/decalage/balbuzard/wiki/Home](https://bitbucket.org/decalage/balbuzard/wiki/Home)
+  - [https://github.com/Microsoft/binskim](https://github.com/Microsoft/binskim)
 * Move todo to issues in Github.  
 
