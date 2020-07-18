@@ -84,7 +84,7 @@ Since there are many changes in the code at the moment the best information abou
 
 A typical invocation for me is:
 
-	./afar.sh -o -Z test/*
+    ./afar.sh -o -Z test/*
 
 ## Result
 

@@ -1,7 +1,7 @@
 Remove-Item -Force -Recurse 'C:\Run\Report\*'
 Remove-Item -Force -Recurse 'C:\Run\lnk_report.zip'
 
-cd C:\Run
+Set-Location C:\Run
 C:\Run\LECmd.exe -f "$args" --json "C:\Run\Report" --jsonpretty > C:\Run\Report\lnk-xml-stdout.txt
 C:\Run\LECmd.exe -f "$args" > C:\Run\Report\lnk.txt
 
