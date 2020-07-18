@@ -20,14 +20,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: Install missing python packages
-      run: sudo apt-get install -y --no-install-recommends python3-venv python3-setuptools
-
-    - name: Install dependencies with pip + requirements.txt
-      run: |
-        python3 -m venv .venv
-        .venv/bin/pip install -r requirements.txt
-
     # Now we move the dependencies where super-linter can see them
     - name: Move the dependencies
       run: mv .venv /home/runner/work/_temp/_github_workflow
