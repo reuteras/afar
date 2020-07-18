@@ -1,5 +1,7 @@
 # AFAR
 
+![Linter](https://github.com/reuteras/afar/workflows/Linter/badge.svg)
+
 AFAR - Automatic File Analyze and Reporting is a script that takes a list of files as input and runs them through a couple of tests and generates a report that can be used as a starting point for further malware analyzes. This tool main usefulness is to automate malware analyzes. Tests are done in Virtual machines. At the moment it is only written to work with VMware [Fusion](https://www.vmware.com/products/fusion/) on Mac [OS X](https://www.apple.com/osx/). It uses three virtual machines for different tests. My setup is the following:
 
 * [Debian](https://www.debian.org/) with [Cuckoo Sandbox](https://cuckoosandbox.org/). I use Cuckoo Sandbox 2.0-dev which uses [Volatility](http://www.volatilityfoundation.org/) and [Suricata](http://suricata-ids.org/). The VM is configured with my [cuckoo-tools](https://github.com/reuteras/cuckoo-tools) script.
