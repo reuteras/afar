@@ -33,8 +33,7 @@ jobs:
       run: mv .venv /home/runner/work/_temp/_github_workflow
     # Now we set the PYTHONPATH to the path of the dependencies *inside* the container
     - name: Lint Code Base
-      uses: docker://github/super-linter:v2.2.0
+      uses: docker://github/super-linter:v3
       env:
         VALIDATE_ALL_CODEBASE: true
-        PYTHONPATH: "/github/workspace/:/github/workflow/.venv/lib/python3.6/site-packages"
 
